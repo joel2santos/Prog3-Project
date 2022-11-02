@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SavePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\DB;
 class PostController extends Controller
 {
     // __invoke is good for a one-function controller.
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
+
     public function index()
     {
         $posts = Post::get();
@@ -26,26 +32,41 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create', ['post' => new Post]);
     }
 
-    public function store(Request $request)
+    public function store(SavePostRequest $request)
     {
-        $request->validate([
-            'title' => ['required'],
-            'body' => ['required'],
-        ], [
-            'title.required' => 'El título del post es obligatorio.'
-            'body.required' => 'El contenido del post es obligatorio.'
-        ]);
+        // never utilize all() method when creating or updating
+        Post::create($request->validated());
+        return to_route('posts.index')->with('status', 'Post created!');
+    }
 
-        $post = new Post;
-        $post->title = $request->input('title');
-        $post->body = $request->input('body');
-        $post->save();
+    public function edit(Post $post)
+    {
+        return view('posts.edit', ['post' => $post]);
+    }
 
-        session()->flash('status', 'Post saved!');
+    public function update(SavePostRequest $request, Post $post)
+    {
+        $post->update($request->validated());
+        return to_route('posts.index')->with('status', 'Post updated!');
+    }
 
-        return to_route('posts.index');
+    public function destroy(Post $post)
+    {
+        $post->delete();
+        return to_route('posts.index')->with('status', 'Post deleted!');
     }
 }
+
+// other methods: 
+
+// $post->title = $request->input('title');
+// $post->body = $request->input('body');
+// $post->save();
+
+// $post->update([
+//     'title' => $request->input('title'),
+//     'body' => $request->input('body')
+// ]);

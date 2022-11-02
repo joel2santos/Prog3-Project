@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Project - {{ $title ?? '' }} </title>
     <meta name="description" content="{{ $metaDesc ?? 'Placeholder'}}" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <x-layouts.nav />

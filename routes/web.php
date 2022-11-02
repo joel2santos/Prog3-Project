@@ -11,18 +11,34 @@ use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 // project.test
-Route::view('/', 'index')->name('Home');
+Route::view('/', 'index')->name('home');
 
 // project.test/blog
-Route::controller(PostController::class)->group(function () {
-    Route::get('/blog', 'index')->name('posts.index');
-    Route::get('/blog/create', 'create')->name('posts.create');
-    Route::get('/blog/post/{post}', 'show')->name('posts.show');
-    Route::post('/blog', 'store')->name('posts.store');
-});
+// Route::controller(PostController::class)->group(function () {
+//     // Views
+//     Route::get('/blog', 'index')->name('posts.index');
+//     Route::get('/blog/create', 'create')->name('posts.create');
+//     Route::get('/blog/edit/{post}', 'edit')->name('posts.edit');
+//     Route::get('/blog/post/{post}', 'show')->name('posts.show');
+
+//     // Methods
+//     Route::post('/blog', 'store')->name('posts.store');
+//     Route::patch('/blog/{post}', 'update')->name('posts.update');
+//     Route::delete('/blog/{post}', 'destroy')->name('posts.destroy');
+// });
+
+Route::resource('blog', PostController::class, [
+    'names' => 'posts',
+    'parameters' => ['blog' => 'post'],
+]);
 
 // project.test/about
-Route::view('/about', 'about')->name('About');
+Route::view('/about', 'about')->name('about')->middleware('auth');
 
 // project.test/contact
-Route::view('/contact', 'contact')->name('Contact');
+Route::view('/contact', 'contact')->name('contact');
+
+//project.test/login
+Route::get('/login', function () {
+    return 'Login page';
+})->name('login');
